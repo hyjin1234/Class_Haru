@@ -10,7 +10,7 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
-	<header id="header" class="pof">
+	<header id="header" class="pof" style="border-bottom:1px solid #eeeeee;">
 		<div class="header_wrapper">
 			<!-- logo -->
 			<h1 class="logo">
@@ -41,7 +41,7 @@
 			<nav class="nav_gnb">
 				<ul>
 					<li><a href="#">튜터등록</a></li>
-					<li><a href="#">커뮤니티</a></li>
+					<li><a href="../board/board_main.do">커뮤니티</a></li>
 					<c:if test="${sessionScope.id!=null }">
 						<li class="depth"><a onclick="qPop(0)">메시지💬</a></li>
 						<li><a href="#">수업신청서</a></li>
