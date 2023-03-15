@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -17,76 +18,140 @@
 </head>
 <body>
 <div class="container">
-	<div style="margin-left:20px"> 
-		<span style="font-size: 20px;font-weight: 700;line-height: 50px;">관리자</span> 페이지입니다
-	</div>
+	<jsp:include page="../adminpage/header.jsp"></jsp:include>
 	
 	<div style="width:20%;height:100%;padding:5px;float:left;">
-	  <div class=rows>
-	  	<div style="height:100px;margin:5px;padding:10px;border:2px solid #45c5c5;">
-	  		<div style="height:50px;">
-	  	  		<img src="../images/gtop.png" style="height: 40px">
-	  	  		<span>마스터</span>
-	  		</div>
-	  		<div style="height:30px;">
-		  		<span class="mintBtn" value="로그아웃">로그아웃</span>
-		  		<span class="mintBtn">정보수정</span>
-	  		</div>
-	  	</div>
-	  </div>
-	  <div style="height: 10px;"></div>
-	  <div class=rows>
-		<ul style="margin:5px;padding:10px;border:1px solid #45c5c5;border-radius:10px">
-			<div class="my_li">
-		  	    <li class="my_menu">공지사항 관리</li>
-		  	    <span><li class="my_menu2"><a href="../board/board_insert.do?btype=3">공지 등록</a></li></span>
-		  	    <span><li class="my_menu2"><a href="../board/board_main.do?btype=3">공지 수정</a></span>
-	  	    </div>
-	  	    <div class="my_li">
-	  	    	<li class="my_menu">강의 관리</li>
-	  	    	<span><li class="my_menu2"><a href="../adminpage/classCon.do">강의 승인</a></li></span>
-	  	    </div>
-	  	    <div class="my_li">
-		  	    <li class="my_menu">회원 관리</li>
-		  	    <span><li class="my_menu2"><a href="../adminpage/member.do">일반회원 관리</a></li></span>
-		  	    <span><li class="my_menu2"><a href="../adminpage/tutCon.do">튜터 관리</a></li></span>
-			</div>
-		</ul>
-	  </div>
+		<jsp:include page="../adminpage/menu.jsp"></jsp:include>
 	</div>
 	
 	<div style="width:80%;float:left;">
 	  <div class=rows>
-		<div class="mintBtn_m">
-			<i></i>&nbsp;공지등록
-		</div>
 		<div>
 			<table class="table" style="table-layout: fixed;">
 				<tr>
-					<th width="15%" class="text-center">분류</th>
-					<th width="45%" class="text-center">제목</th>
-					<th width="15%" class="text-center">작성일</th>
-					<th width="10%" class="text-center">조회수</th>
-					<th width="15%" class="text-center">수정/삭제</th>
+					<th width="15%" class="text-center">프로필</th>
+					<th width="15%" class="text-center">닉네임</th>
+					<th width="30%" class="text-center">아이디</th>
+					<th width="20%" class="text-center">이름</th>
+					<th width="10%" class="text-center">튜터</th>
+					<th width="10%" class="text-center">관리</th>
 				</tr>
-				<tr style="vertical-align: middle;">
-					<td width="10%" class="text-center"><a href="#"></a></td>
-					<td width="45%" class="text-center"><a href="#"></a></td>
-					<td width="15%" class="text-center"><a href="#"></a></td>
-					<td width="10%" class="text-center"><a href="#"></a></td>
-					<td width="15%" class="text-center">
-						<span><img src="#" style="height:20px;"></span>
-						<span><img src="#" style="height:20px;"></span>
+				<tr style="vertical-align: middle;" v-for="vo in member_list">
+					<td width="15%" class="text-center origin">
+						<img :src="vo.image" style="height: 40px;border-radius: 50px">
+					</td>
+					<td width="15%" class="text-center origin">{{vo.nickname}}</td>
+					<td width="30%" class="text-center origin">{{vo.id}}</td>
+					<td width="20%" class="text-center origin">{{vo.name}}</td>
+					<td width="10%" class="text-center origin" v-if="vo.tutor=='y'">튜터</td>
+					<td width="10%" class="text-center origin" v-if="vo.tutor=='n'">
+						<span v-on:click="tutorups(vo.id)">학생</span>
+					</td>
+					<td width="10%" class="text-center origin">
+						<span><img src="#" style="height:20px;" v-on:click="memberDelete(vo.id)"></span>
 					</td>
 				</tr>
 			</table>
 		</div>
 	  </div>
 	</div>
+	
+	<template>
+		<b-modal ref="tutor_up" title="튜터 신청 정보">
+		  <div>
+		  	<table class=table>
+		  	  <tr>
+		  	  	<td width=10%>이름</td>
+		  	  	<td width=17%>{{member_detail.name}}</td>
+		  	  	<td width=8%>ID</td>
+		  	  	<td width=35%>{{member_detail.id}}</td>
+		  	  	<td width=12%>닉넴</td>
+		  	  	<td width=18%>{{member_detail.nickname}}</td>
+		  	  </tr>
+		  	  <tr>
+		  	  	<td colspan=4>
+		  	  		<img :src="member_detail.image">
+		  	  	</td>
+		  	  </tr>
+		  	  <tr>
+		  	  	<td colspan=4>
+		  	  		<p>{{member_detail.intro}}</p>
+		  	  	</td>
+		  	  </tr>
+		  	</table>
+		  </div>
+		  <div class="text-center">
+		    <b-button variant="outline-warning" inline @click="tutorok">튜터 승인</b-button>
+		    <b-button variant="outline-primary" inline @click="hide">취소</b-button>
+		  </div>
+		</b-modal>
+	</template>
 </div>
 <script>
 	new Vue({
-		el:'.container'
+		el:'.container',
+		data:{
+			member_list:[],
+			curpage:1,
+			totalpage:0,
+			stu_id:'',
+			member_detail:{}
+		},
+		mounted:function(){
+			this.send()
+		},
+		methods:{
+			send:function(){
+				let _this=this
+				axios.get("http://localhost/web/adminpage/member_list_vue.do",{
+					params:{
+						page:this.curpage
+					}
+				}).then(function(response){
+					console.log(response.data)
+					_this.member_list=response.data
+					_this.curpage=response.data[0].curpage
+					_this.totalpage=response.data[0].totalpage
+				})
+			},
+			tutorups:function(stu){
+				this.$refs['tutor_up'].show()
+				this.stu_id=stu
+				let _this=this
+				axios.get("http://localhost/web/adminpage/member_detail_vue.do",{
+					params:{
+						id:stu
+					}
+				}).then(function(response){
+					console.log(response.data)
+					_this.member_detail=response.data
+				})
+			},
+			tutorok:function(){
+				let _this=this
+				axios.get("http://localhost/web/adminpage/tutor_ok_vue.do",{
+					params:{
+						id:_this.stu_id
+					}
+				}).then(function(response){
+					location.href="../adminpage/member.do"
+				})
+			},
+			hide:function(){
+				this.$refs['tutor_up'].hide()
+			},
+			memberDelete:function(id){
+				if(confirm('정말로 삭제하시겠습니까?\n삭제 내역은 복구되지 않습니다')){
+					axios.get('http://localhost/web/adminpage/member_delete_vue.do',{
+						params:{
+							id:id
+						}
+					}).then(function(response){
+						location.href="../adminpage/member.do"
+					})
+				}
+			}
+		}
 	})
 </script>
 </body>
